@@ -1,4 +1,7 @@
-﻿using Ninject;
+﻿using Moq;
+using Ninject;
+using SportsStore.Domain.Abstract;
+using SportsStore.Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Web.Mvc;
@@ -13,12 +16,7 @@ namespace SportsStore.WebUI.Infastructure
         {
             kernel = kernelParam;
             AddBindings();
-        }
-
-        private void AddBindings()
-        {
-            
-        }
+        }       
 
         public object GetService(Type serviceType)
         {
@@ -28,6 +26,16 @@ namespace SportsStore.WebUI.Infastructure
         public IEnumerable<object> GetServices(Type serviceType)
         {
             return kernel.GetAll(serviceType);
+        }
+        private void AddBindings()
+        {
+            Mock<IProductRepository> mock = new Mock<IProductRepository>();
+            mock.Setup(m => m.Products).Returns(new List<Product> {
+                new Product {Name = "Football" , Price = 25},
+                new Product {Name = "Surf Board", Price = 179 },
+                new Product {Name = "Running Shoes", Price = 95 }
+            });
+            kernel.Bind<IProductRepository>().ToConstant(mock.Object);
         }
     }
 }
